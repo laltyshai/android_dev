@@ -3,24 +3,27 @@ import "package:android_dev/screens/home_screen/models/post_model.dart";
 import "package:android_dev/screens/home_screen/models/comment_model.dart";
 import "package:flutter/material.dart";
 
-class PostWidget extends StatefulWidget {
+class PostWidget extends StatelessWidget {
   final PostModel? post;
-  const PostWidget({super.key,required this.post});
+  final VoidCallback onTap;
+  final VoidCallback onCommentTap;
 
-  @override
-  State<PostWidget> createState() => _PostWidgetState();
-}
+  const PostWidget({
+    super.key,
+    required this.post,
+      required this.onTap,
+    required this.onCommentTap
+  });
 
-class _PostWidgetState extends State<PostWidget> {
-  final bool isLiked = false; 
+
  // This should ideally be managed by state management
 
- void openBottomSheet() {
+ void openBottomSheet(BuildContext cont) {
     // Each post shows only its own comments.
-    final List<CommentModel> comments = widget.post?.comments ?? [];
+    final List<CommentModel> comments = post?.comments ?? [];
     showModalBottomSheet(
 
-      context: context,
+      context:cont,
       builder: (BuildContext context) {
         return Container(
           // height: 1200,
@@ -32,7 +35,7 @@ class _PostWidgetState extends State<PostWidget> {
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(4.0),
-            child: CommentItem(post: comments[index]),
+            child: CommentItem(post: comments[index], onTap: onCommentTap),
           );
         },
       ),
@@ -63,7 +66,7 @@ class _PostWidgetState extends State<PostWidget> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Image.network(
-              widget.post?.imageUrl ?? 'https://via.placeholder.com/150',
+              post?.imageUrl ?? 'https://via.placeholder.com/150',
               width: double.infinity,
               fit: BoxFit.cover,
             ),
@@ -71,23 +74,16 @@ class _PostWidgetState extends State<PostWidget> {
           Row(
             children: [
               IconButton(
-                icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border),
+                icon: Icon(Icons.favorite),
                 onPressed: () {
-                  setState(() {
-                    // This should ideally update the like count in a state management solution
-                    if (isLiked) {
-                      widget.post?.addLike((widget.post?.likeCount ?? 1) - 1);
-                    } else {
-                      widget.post?.addLike((widget.post?.likeCount ?? 0) + 1);
-                    }
-                  });
+                 onTap;
                 },
               ),
-              Text('${widget.post?.likeCount ?? 0}'),
+              Text('${post?.likeCount ?? 0}'),
               IconButton(
                 icon: const Icon(Icons.comment),
                 onPressed: () {
-                  openBottomSheet();
+                  openBottomSheet(context);
                 },
               ),
               IconButton(
@@ -102,7 +98,7 @@ class _PostWidgetState extends State<PostWidget> {
             ],
           ),
           Text(
-            widget.post?.description ?? '',
+            post?.description ?? '',
             style: const TextStyle(fontSize: 16.0),
           ),
 
