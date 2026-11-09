@@ -1,20 +1,14 @@
 import "package:android_dev/screens/home_screen/models/story_model.dart";
 import "package:flutter/material.dart";
-import "package:android_dev/screens/home_screen/services/comment_services.dart";
 
-class StoryWidget extends StatefulWidget {
+class StoryWidget extends StatelessWidget {
   final StoryModel? story;
-  const StoryWidget({super.key,required this.story});
+  const StoryWidget({
+    super.key,
+    required this.story,
+    
+    });
 
-  @override
-  State<StoryWidget> createState() => _StoryWidgetState();
-}
-
-class _StoryWidgetState extends State<StoryWidget> {
-  final bool isLiked = false; 
- // This should ideally be managed by state management
-  CommentService commentService = CommentService();
-  
 
 
   @override
@@ -26,11 +20,11 @@ class _StoryWidgetState extends State<StoryWidget> {
         CircleAvatar(
           radius: 32,
           backgroundImage: NetworkImage(
-            widget.story?.avatar ?? 'https://via.placeholder.com/150',
+            story?.avatar ?? 'https://via.placeholder.com/150',
           ),
         ),
         const SizedBox(height: 4),
-        Text(widget.story?.name ?? 'user', style: const TextStyle(fontSize: 12)),
+        Text(story?.name ?? 'user', style: const TextStyle(fontSize: 12)),
       ],
       )
     );
