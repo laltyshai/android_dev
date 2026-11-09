@@ -2,7 +2,6 @@ import "package:android_dev/screens/content/comment_item.dart";
 import "package:android_dev/screens/home_screen/models/post_model.dart";
 import "package:android_dev/screens/home_screen/models/comment_model.dart";
 import "package:flutter/material.dart";
-import "package:android_dev/screens/home_screen/services/comment_services.dart";
 
 class PostWidget extends StatefulWidget {
   final PostModel? post;
@@ -15,30 +14,25 @@ class PostWidget extends StatefulWidget {
 class _PostWidgetState extends State<PostWidget> {
   final bool isLiked = false; 
  // This should ideally be managed by state management
-  CommentService commentService = CommentService();
-  
+
  void openBottomSheet() {
-  commentService.batchAddPosts(List.generate(
-      10,
-      (index) => CommentModel(
-        imageUrl: 'https://www.thedesignwork.com/wp-content/uploads/2011/10/Random-Pictures-of-Conceptual-and-Creative-Ideas-01.jpg',
-        text: 'This is a sample comment description. It can be quite long and will wrap to the next line if necessary.',
-        likeCount: 0,
-      ),
-    ));
+    // Each post shows only its own comments.
+    final List<CommentModel> comments = widget.post?.comments ?? [];
     showModalBottomSheet(
-      
+
       context: context,
       builder: (BuildContext context) {
         return Container(
           // height: 1200,
           color: Colors.white,
-          child:ListView.builder(
-        itemCount: commentService.comList.length,
+          child: comments.isEmpty
+              ? const Center(child: Text('No comments yet'))
+              : ListView.builder(
+        itemCount: comments.length,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.all(4.0),
-            child: CommentItem(post: commentService.comList[index]),
+            child: CommentItem(post: comments[index]),
           );
         },
       ),
