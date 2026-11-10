@@ -43,7 +43,7 @@ class HomeTab extends StatelessWidget {
           }
           return Padding(
             padding: const EdgeInsets.all(4.0),
-            child: PostWidget(post: postServices.posts[index - 1]),
+            child: PostWidget(post: postServices.posts[index - 1], onTap: ()=> {}, onCommentTap:()=> {}),
           );
         },
       ),
