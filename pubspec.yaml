@@ -4,10 +4,11 @@ publish_to: 'none'
 version: 0.1.0+1
 
 environment:
-  sdk: ^3.13.7
+  sdk: ^3.13.4
 
 dependencies:
   animated_bottom_navigation_bar: ^1.4.1
+  dio: ^5.11.1
   flutter:
     sdk: flutter
   
