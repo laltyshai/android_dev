@@ -1,51 +1,26 @@
-import "package:android_dev/screens/content/post_widget.dart";
-import "package:android_dev/screens/content/story_widget.dart";
-import "package:android_dev/screens/home_screen/data/mock_posts.dart";
-import "package:android_dev/screens/home_screen/data/mock_story.dart";
-import "package:android_dev/screens/home_screen/services/post_services.dart";
-import "package:android_dev/screens/home_screen/services/story_services.dart";
-import "package:flutter/material.dart";
+import 'package:android_dev/screens/content/post_widget.dart';
+import 'package:android_dev/screens/home_screen/state/feed_controller.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeTab extends StatelessWidget {
-  const new({super.key});
+class HomeTab extends ConsumerWidget {
+  const HomeTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    PostServices postServices = PostServices();
-    postServices.batchAddPosts(mockPosts);
-
-    StoryServices storyServices = StoryServices();
-    storyServices.batchAddPosts(mockStories);
-
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    final posts = ref.watch(feedControllerProvider);
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        title: const Text('Instagram'),
-      ),
+      appBar: AppBar(title: const Text('Instagram')),
       body: ListView.builder(
-        itemCount: postServices.posts.length + 1,
-        itemBuilder: (context, index) {
-          if (index == 0) {
-            return SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: storyServices.storyList.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: StoryWidget(story: storyServices.storyList[index]),
-                  );
-                },
-              ),
-            );
-          }
-          return Padding(
-            padding: const EdgeInsets.all(4.0),
-            child: PostWidget(post: postServices.posts[index - 1], onTap: ()=> {}, onCommentTap:()=> {}),
-          );
-        },
+        itemCount: posts.length,
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.all(4),
+          child: PostWidget(
+            post: posts[index],
+            onLike: () => ref.read(feedControllerProvider.notifier).toggleLike(posts[index].id),
+          ),
+        ),
       ),
     );
   }
