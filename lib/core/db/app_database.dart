@@ -28,6 +28,18 @@ class UserProfiles extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+  
+}
+
+class PostLikes extends Table {
+  TextColumn get userId => text().references(UserProfiles, #id)();
+  TextColumn get postId => text().references(CachedPosts, #id)();
+  
+
+  @override
+  Set<Column<Object>> get primaryKey => {userId, postId};
+
+  
 }
 
 @DriftDatabase(tables: [CachedPosts, UserProfiles])
