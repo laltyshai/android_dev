@@ -42,10 +42,29 @@ class PostLikes extends Table {
   
 }
 
-@DriftDatabase(tables: [CachedPosts, UserProfiles])
+@DriftDatabase(tables: [CachedPosts, UserProfiles, PostLikes])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'social_app'));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+    @override
+    MigrationStrategy get migration => MigrationStrategy(
+      onCreate: (m) async {
+        await m.createAll();
+      },
+      onUpgrade: (m, from, to) async {
+        if (from<2){
+        await m.deleteTable('user_profiles');
+        await m.createTable(userProfiles);      // new table
+        await m.createTable(postLikes);
+        }
+     
+      },
+ beforeOpen: (details) async {
+    await customStatement('PRAGMA foreign_keys = ON');
+  },
+    );
+  
+  // ÷what is migration?
 }
