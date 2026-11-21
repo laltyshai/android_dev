@@ -17,6 +17,7 @@ class PostWidget extends StatelessWidget {
     );
   }
 
+
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
