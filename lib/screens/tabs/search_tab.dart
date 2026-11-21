@@ -1,4 +1,6 @@
 import "package:android_dev/screens/home_screen/services/dio_service.dart";
+import "package:android_dev/screens/auth/login_screen.dart";
+import "package:android_dev/screens/auth/registration_screen.dart";
 import "package:android_dev/widgets/image_grid_item.dart";
 import "package:material_ui/material_ui.dart";
 
@@ -32,6 +34,22 @@ class _SearchTabState extends State<SearchTab> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text('Instagram'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+            ),
+            child: const Text('Login'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const RegistrationScreen()),
+            ),
+            child: const Text('Register'),
+          ),
+        ],
       ),
       body: FutureBuilder<List<dynamic>>(
         future: _futureData,
