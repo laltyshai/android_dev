@@ -7,7 +7,7 @@ import "package:android_dev/widgets/animated_indexed_stack.dart";
 import "package:material_ui/material_ui.dart";
 
 class MainScreen extends StatefulWidget {
-  const new({super.key});
+  const MainScreen({super.key});
 
   @override
   State<MainScreen> createState() => _MainScreenState();

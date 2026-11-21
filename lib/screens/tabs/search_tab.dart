@@ -3,7 +3,7 @@ import "package:android_dev/widgets/image_grid_item.dart";
 import "package:material_ui/material_ui.dart";
 
 class SearchTab extends StatefulWidget {
-  const new({super.key});
+  const SearchTab({super.key});
 
   @override
   State<SearchTab> createState() => _SearchTabState();
