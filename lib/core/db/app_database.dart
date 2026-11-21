@@ -20,6 +20,11 @@ class UserProfiles extends Table {
   TextColumn get id => text()();
   TextColumn get nickname => text()();
   TextColumn get avatarUrl => text().nullable()();
+  TextColumn get email => text().unique()();
+  TextColumn get password => text()();
+  TextColumn get salt => text()();
+  
+  //todo i can not do: hash password with crypto package
 
   @override
   Set<Column<Object>> get primaryKey => {id};
