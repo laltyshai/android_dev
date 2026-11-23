@@ -1,11 +1,11 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
 /// An [IndexedStack] that animates between children and keeps each page's
 /// state alive (scroll position, text input, etc.), like Instagram's tabs.
 ///
 /// Pages are built lazily: a page is only created the first time it is shown.
 class AnimatedIndexedStack extends StatefulWidget {
-  const new({
+  const AnimatedIndexedStack({
     super.key,
     required this.index,
     required this.children,

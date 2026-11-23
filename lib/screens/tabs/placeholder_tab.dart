@@ -1,8 +1,8 @@
-import "package:flutter/material.dart";
+import "package:material_ui/material_ui.dart";
 
 // Temporary page for tabs that don't have real content yet.
 class PlaceholderTab extends StatelessWidget {
-  const new({super.key, required this.title, required this.icon});
+  const PlaceholderTab({super.key, required this.title, required this.icon});
 
   final String title;
   final IconData icon;

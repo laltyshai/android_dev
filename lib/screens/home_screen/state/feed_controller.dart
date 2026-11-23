@@ -1,27 +1,56 @@
+import 'package:android_dev/core/auth/auth_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:android_dev/core/db/app_database.dart';
+import '../services/local_data_service.dart';
 import '../models/post_model.dart';
 import '../services/post_services.dart';
 
-// Dependency injection: Riverpod creates the service once, others ask for it.
-final postServicesProvider = Provider<PostServices>((ref) => PostServices());
+extension CachedPostMapper on CachedPost {
+  PostModel toModel() => PostModel(
+        id: id,
+        imageUrl: imageUrl,
+        description: caption,
+        authorId: authorId,
+        authorName: authorName,
+        likeCount: likes,
+        isLiked: isLiked,
+      );
+}
 
-class FeedController extends Notifier<List<PostModel>> {
-  @override
-  List<PostModel> build() => ref.read(postServicesProvider).getPosts();
+final feedPostsProvider = StreamProvider<List<PostModel>>((ref) {
+  return ref.watch(localDataServiceProvider).watchPosts().map(
+        (posts) => posts.map((post) => post.toModel()).toList(),
+      );
+});
 
-  void toggleLike(String id) {
-    state = [
-      for (final post in state)
-        if (post.id == id)
-          post.copyWith(
-            isLiked: !post.isLiked,
-            likeCount: post.likeCount + (post.isLiked ? -1 : 1),
-          )
-        else
-          post,
-    ];
+class FeedController {
+  FeedController(this._localData, this._ref);
+
+  final LocalDataService _localData;
+  final Ref _ref;
+
+  Future<void> toggleLike(String id) async {
+    final user = _ref.read(authProvider);
+    final post = await _localData.getPost(id);
+    if (post != null && user != null) await _localData.toggleLike(post, user.id);
+  }
+
+  Future<void> createPost({required String imageUrl, required String caption}) async {
+    final user = _ref.read(authProvider);
+    if (user == null) return;
+    final now = DateTime.now().microsecondsSinceEpoch;
+    return _localData.savePost(
+      CachedPostsCompanion.insert(
+        id: 'post-$now',
+        authorId: user.id,
+        authorName: user.nickname,
+        imageUrl: imageUrl,
+        caption: caption,
+      ),
+    );
   }
 }
 
-final feedControllerProvider =
-    NotifierProvider<FeedController, List<PostModel>>(FeedController.new);
+final feedControllerProvider = Provider<FeedController>(
+  (ref) => FeedController(ref.watch(localDataServiceProvider), ref),
+);
