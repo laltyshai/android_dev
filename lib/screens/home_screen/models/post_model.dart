@@ -1,3 +1,5 @@
+import 'package:android_dev/screens/home_screen/models/comment_model.dart';
+
 class PostModel {
   final String id;
   final String imageUrl;
