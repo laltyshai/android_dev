@@ -1,3 +1,5 @@
+import 'package:android_dev/core/auth/auth_controller.dart';
+import 'package:android_dev/screens/auth/registration_screen.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,12 +24,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (email.isEmpty || password.isEmpty) return;
-    // TODO: find the user by email, hash `password` with the stored salt,
-    // compare it with the stored hash.
+    final error = await ref.read(authProvider.notifier).login(email, password);
+    if (error != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }
   }
 
   @override
@@ -52,6 +56,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
             const SizedBox(height: 20),
             FilledButton(onPressed: _submit, child: const Text('Log in')),
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RegistrationScreen()),
+              ),
+              child: const Text('No account yet? Register!'),
+            ),
           ],
         ),
       ),

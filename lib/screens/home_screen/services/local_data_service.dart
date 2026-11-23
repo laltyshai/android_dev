@@ -44,15 +44,33 @@ class LocalDataService {
   Future<void> deletePost(String id) =>
       (_database.delete(_database.cachedPosts)..where((post) => post.id.equals(id))).go();
 
-  Future<void> toggleLike(CachedPost post) {
-    final isLiked = !post.isLiked;
-    return (_database.update(_database.cachedPosts)..where((row) => row.id.equals(post.id))).write(
+  Future<void> toggleLike(CachedPost post, String userId) async {
+    // Did this user already like this post? Look in the post_likes table.
+    final likeQuery = _database.select(_database.postLikes)
+      ..where((like) => like.postId.equals(post.id) & like.userId.equals(userId));
+    final alreadyLiked = await likeQuery.getSingleOrNull() != null;
+
+    if (alreadyLiked) {
+      await (_database.delete(_database.postLikes)
+            ..where((like) => like.postId.equals(post.id) & like.userId.equals(userId)))
+          .go();
+    } else {
+      await _database.into(_database.postLikes)
+          .insert(PostLikesCompanion.insert(userId: userId, postId: post.id));
+    }
+
+    final isLiked = !alreadyLiked;
+    await (_database.update(_database.cachedPosts)..where((row) => row.id.equals(post.id))).write(
       CachedPostsCompanion(
         isLiked: Value(isLiked),
         likes: Value(post.likes + (isLiked ? 1 : -1)),
       ),
     );
   }
+
+  Future<UserProfile?> findUserByEmail(String email) =>
+      (_database.select(_database.userProfiles)..where((user) => user.email.equals(email)))
+          .getSingleOrNull();
 
   Stream<List<UserProfile>> watchProfiles() => _database.select(_database.userProfiles).watch();
 
@@ -89,7 +107,7 @@ class LocalDataService {
     }
   }
 
-  Future<void> addComment({required String postId, required String body}) async {
+  Future<void> addComment({required String postId, required String authorName, required String body}) async {
     await _commentsTableReady;
     final now = DateTime.now();
     await _database.customStatement(
@@ -97,7 +115,7 @@ class LocalDataService {
       [
         Variable.withString('comment-${now.microsecondsSinceEpoch}'),
         Variable.withString(postId),
-        Variable.withString('alimhan'),
+        Variable.withString(authorName),
         Variable.withString(body),
         Variable.withInt(now.millisecondsSinceEpoch),
       ],

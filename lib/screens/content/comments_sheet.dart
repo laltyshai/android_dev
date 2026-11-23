@@ -1,3 +1,4 @@
+import 'package:android_dev/core/auth/auth_controller.dart';
 import 'package:android_dev/screens/home_screen/services/local_data_service.dart';
 import 'package:android_dev/screens/home_screen/models/comment_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,8 +29,11 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
   Future<void> _submit() async {
     final body = _controller.text.trim();
     if (body.isEmpty) return;
+    final user = ref.read(authProvider);
+    if (user == null) return;
     await ref.read(localDataServiceProvider).addComment(
           postId: widget.postId,
+          authorName: user.nickname,
           body: body,
         );
     _controller.clear();

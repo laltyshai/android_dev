@@ -1,3 +1,4 @@
+import 'package:android_dev/core/auth/auth_controller.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,13 +22,18 @@ class _RegistrationScreenState extends ConsumerState<RegistrationScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final nickname = _nicknameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     if (nickname.isEmpty || email.isEmpty || password.isEmpty) return;
-    // TODO: make a random salt, hash `password` + salt with the crypto package,
-    // then save a new UserProfile (id, nickname, email, hash, salt).
+    final error = await ref.read(authProvider.notifier).register(nickname, email, password);
+    if (!mounted) return;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    } else {
+      Navigator.pop(context); // close this screen, we are logged in now
+    }
   }
 
   @override

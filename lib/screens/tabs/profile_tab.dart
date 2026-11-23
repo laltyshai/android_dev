@@ -1,12 +1,12 @@
 import 'package:android_dev/screens/home_screen/state/feed_controller.dart';
 import 'package:android_dev/screens/home_screen/services/local_data_service.dart';
 import 'package:android_dev/core/db/app_database.dart';
-import 'package:drift/drift.dart' hide Column;
+import 'package:android_dev/core/auth/auth_controller.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final currentProfileProvider = StreamProvider<UserProfile?>(
-  (ref) => ref.watch(localDataServiceProvider).watchProfile('me'),
+  (ref) => ref.watch(localDataServiceProvider).watchProfile(ref.watch(authProvider)?.id ?? ''),
 );
 
 class ProfileTab extends ConsumerWidget {
@@ -27,6 +27,10 @@ class ProfileTab extends ConsumerWidget {
             icon: const Icon(Icons.edit_outlined),
             onPressed: () => _showEditProfile(context, ref, nickname, avatarUrl),
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authProvider.notifier).logout(),
+          ),
         ],
       ),
       body: posts.when(
@@ -34,7 +38,7 @@ class ProfileTab extends ConsumerWidget {
         error: (error, _) => Center(child: Text('Could not load profile: $error')),
         data: (allPosts) {
           final ownPosts =
-              allPosts.where((post) => post.authorId == 'me').toList();
+              allPosts.where((post) => post.authorId == profile?.id).toList();
           return CustomScrollView(slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -127,12 +131,9 @@ class ProfileTab extends ConsumerWidget {
               final name = nameController.text.trim();
               if (name.isEmpty) return;
               final image = imageController.text.trim();
-              await ref.read(localDataServiceProvider).saveProfile(
-                    UserProfilesCompanion.insert(
-                      id: 'me',
-                      nickname: name,
-                      avatarUrl: Value(image.isEmpty ? null : image),
-                    ),
+              await ref.read(authProvider.notifier).updateProfile(
+                    name,
+                    image.isEmpty ? null : image,
                   );
               if (dialogContext.mounted) Navigator.pop(dialogContext);
             },

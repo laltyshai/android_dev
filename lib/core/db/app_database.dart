@@ -24,7 +24,6 @@ class UserProfiles extends Table {
   TextColumn get password => text()();
   TextColumn get salt => text()();
   
-  //todo i can not do: hash password with crypto package
 
   @override
   Set<Column<Object>> get primaryKey => {id};
